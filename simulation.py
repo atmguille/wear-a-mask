@@ -84,10 +84,7 @@ class Person:
         :return: True if infected, False if not
         """
         probability = Person.PROBABILITIES[self.wearing_mask, to_infect.wearing_mask]
-        if random.random() < probability:
-            return True
-        else:
-            return False
+        return random.random() < probability
 
     @staticmethod
     def check_infection(person1: 'Person', person2: 'Person') -> Tuple[bool, bool]:
@@ -98,7 +95,6 @@ class Person:
         :param person2:
         :return: p1_got_infected, p2_got_infected
         """
-        global INFECTED
         # Discard if contagion is impossible to happen
         if not person1.is_close(person2) or (person1.is_infected and person2.is_infected) or \
                 (not person1.is_infected and not person2.is_infected):
