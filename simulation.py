@@ -51,11 +51,11 @@ class Person:
     @staticmethod
     def check_infection(person1: 'Person', person2: 'Person') -> Tuple[bool, bool]:
         """
-        Checks if there is a new infection between the two persons, returning a new updated copy
-        of the person that gets infected and the same object for the person that does not. This is done
+        Checks if there is a new infection between the two persons, returning a boolean tuple
+        indicating if any of them got infected
         :param person1:
         :param person2:
-        :return: person1_updated, person2_updated
+        :return: p1_got_infected, p2_got_infected
         """
         global INFECTED
         # Discard if contagion is impossible to happen
@@ -106,12 +106,15 @@ def simulation():
             should_update[person1.id] = should_update[person1.id] or p1_got_infected
             should_update[person2.id] = should_update[person2.id] or p2_got_infected
 
+        """
+        Infection update is done after checking infections among all the population
+        This is done to avoid one person getting infected and infecting another at the
+        same moment due to loop order
+        """
         for person in population:
             if should_update[person.id]:
                 INFECTED += 1
                 person.is_infected = True
-
-        # TODO: moves
 
 
 if __name__ == '__main__':
