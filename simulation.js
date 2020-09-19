@@ -34,11 +34,12 @@ class Move {
     }
 
     in_map() {
-        return 0 <= this.x_dest < MAP_SIZE && 0 <= this.y_dest < MAP_SIZE;
+        return 0 <= this.x_dest && this.x_dest < MAP_SIZE && 0 <= this.y_dest && this.y_dest < MAP_SIZE;
     }
 
     to_free_pos() {
-        return Move.LOCATION_INDEXES.includes([this.x_dest, this.y_dest]);
+        // Note: includes will not work due to inconsistencies with array comparison (that's why JSON is used to compare them)
+        return !Move.LOCATION_INDEXES.some(item => JSON.stringify(item) === JSON.stringify([this.x_dest, this.y_dest]));
     }
 
     is_valid() {
@@ -47,7 +48,9 @@ class Move {
 
     update_indexes() {
         if (!this.is_stay()) {
-            Move.LOCATION_INDEXES = Move.LOCATION_INDEXES.filter((value, index, arr) => value !== [this.x_init, this.y_init]);
+            // 'remove' method does not exist. Also, array comparison has inconsistencies. That's why JSON is used to compare them
+            Move.LOCATION_INDEXES = Move.LOCATION_INDEXES.filter((item, index, arr) =>
+                JSON.stringify(item) !== JSON.stringify([this.x_init, this.y_init]));
             Move.LOCATION_INDEXES.push([this.x_dest, this.y_dest]);
         }
     }
