@@ -1,10 +1,25 @@
 const MAP_SIZE = 10;
+const SPEED = 1000;  // in ms
 const MINIMUM_DISTANCE = 1;
-const N_PERSONS = 100;
+const N_PERSONS = 10;
 const INFECTED_PERCENTAGE = 0.2;
 const MASKS_PERCENTAGE = 0.5;
 const MASKS = Math.floor(N_PERSONS * MASKS_PERCENTAGE);
 let INFECTED = Math.floor(N_PERSONS * INFECTED_PERCENTAGE);
+
+const LEFT_INIT = 100;
+const TOP_INIT = 100;
+const PADDING = 20;
+
+
+function to_absolute_px_x(x) {
+    return `${LEFT_INIT + PADDING*x}px`;
+}
+
+function to_absolute_px_y(y) {
+    return `${TOP_INIT + PADDING*y}px`;
+}
+
 
 class Move {
     static TYPES = ["Stay", "Up", "Down", "Left", "Right", "Up-Left", "Up-Right", "Down-Left", "Down-Right"];
@@ -63,6 +78,11 @@ class Person {
         .set('[false, true]', 0.7)
         .set('[true, false]', 0.05)
         .set('[true, true]', 0.015);
+    static EMOJIS = new Map()
+        .set('[false, false]', '<i class="em em-confused" aria-role="presentation" aria-label="CONFUSED FACE"></i>')
+        .set('[false, true]', '<i class="em em-mask" aria-role="presentation" aria-label="FACE WITH MEDICAL MASK"></i>')
+        .set('[true, false]', '<i class="em em-nauseated_face" aria-role="presentation" aria-label="NAUSEATED FACE"></i>')
+        .set('[true, true]', '<i class="em em-face_with_thermometer" aria-role="presentation" aria-label="FACE WITH THERMOMETER"></i>');
 
     constructor(x, y, infected, mask) {
         this.id = Person.__id++;
@@ -72,8 +92,17 @@ class Person {
         this.wearing_mask = mask;
     }
 
+    get emoji() {
+        return Person.EMOJIS.get(`[${this.is_infected}, ${this.wearing_mask}]`);
+    }
+
     is_close(other) {
         return Math.abs(this.x - other.x) <= MINIMUM_DISTANCE && Math.abs(this.y - other.y) <= MINIMUM_DISTANCE;
+    }
+
+    set_infected() {
+        this.is_infected = true;
+        document.querySelector(`#person-${this.id}`).innerHTML = this.emoji;
     }
 
     should_infect(to_infect) {
@@ -102,6 +131,15 @@ class Person {
             let move = new Move(this.x, this.y, move_type);
             if (move.is_valid()) {
                 move.update_indexes();
+
+                const person = document.querySelector(`#person-${this.id}`);
+                person.animate({
+                    left: [to_absolute_px_x(this.x), to_absolute_px_x(move.x_dest)],
+                    top: [to_absolute_px_y(this.y), to_absolute_px_y(move.y_dest)]
+                }, SPEED)
+
+                person.style.left = to_absolute_px_x(move.x_dest);
+                person.style.top = to_absolute_px_y(move.y_dest);
                 this.x = move.x_dest;
                 this.y = move.y_dest;
                 break;
@@ -134,14 +172,32 @@ function population_init() {
     return population;
 }
 
-function simulation() {
+
+function board_init(population) {
+    for (const person of population) {
+        const span = document.createElement('span');
+        span.id = `person-${person.id}`;
+        span.style.position = 'absolute';
+        span.innerHTML = person.emoji;
+        span.style.left = to_absolute_px_x(person.x);
+        span.style.top = to_absolute_px_y(person.y);
+        document.querySelector('#board').append(span);
+    }
+}
+
+
+async function simulation() {
     let population = population_init();
 
+    board_init(population);
+
     while (INFECTED < N_PERSONS) {
+        await new Promise(r => setTimeout(r, SPEED));  // TODO: add something???
+
         let should_update = Array(...Array(N_PERSONS)).map(() => false);
 
-        for (let i = 0; i < N_PERSONS-1; i++) {
-            for (let j = i+1; j < N_PERSONS; j++) {
+        for (let i = 0; i < N_PERSONS - 1; i++) {
+            for (let j = i + 1; j < N_PERSONS; j++) {
                 const person1 = population[i];
                 const person2 = population[j];
                 const infection_result = Person.check_infection(person1, person2);
@@ -151,12 +207,11 @@ function simulation() {
         }
 
 
-
         population = _.shuffle(population);
         for (let person of population) {
             if (should_update[person.id]) {
                 INFECTED++;
-                person.is_infected = true;
+                person.set_infected();
             }
             person.move();
         }
