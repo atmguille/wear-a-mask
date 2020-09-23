@@ -73,16 +73,16 @@ class Move {
 
 class Person {
     static __id = 0;
-    static PROBABILITIES = new Map()
+    static PROBABILITIES = new Map()  // (infected wearing mask, to_infect wearing_mask)
         .set('[false, false]', 0.9)
         .set('[false, true]', 0.7)
         .set('[true, false]', 0.05)
         .set('[true, true]', 0.015);
-    static EMOJIS = new Map()
-        .set('[false, false]', '<i class="em em-confused" aria-role="presentation" aria-label="CONFUSED FACE"></i>')
-        .set('[false, true]', '<i class="em em-mask" aria-role="presentation" aria-label="FACE WITH MEDICAL MASK"></i>')
-        .set('[true, false]', '<i class="em em-nauseated_face" aria-role="presentation" aria-label="NAUSEATED FACE"></i>')
-        .set('[true, true]', '<i class="em em-face_with_thermometer" aria-role="presentation" aria-label="FACE WITH THERMOMETER"></i>');
+    static EMOJIS = new Map()  // (is_infected, wearing_mask)
+        .set('[false, false]', '<i class="em em-confused"></i>')
+        .set('[false, true]', '<i class="em em-mask"></i>')
+        .set('[true, false]', '<i style="filter: hue-rotate(40deg) brightness(75%);" class="em em-face_with_thermometer"></i>')
+        .set('[true, true]', '<i style="filter: hue-rotate(40deg) brightness(75%);" class="em em-mask"></i>');
 
     constructor(x, y, infected, mask) {
         this.id = Person.__id++;
