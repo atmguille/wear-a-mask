@@ -13,10 +13,10 @@ let POPULATION = [];
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const board_size = document.querySelector('#board_size');
-    const n_persons = document.querySelector('#n_persons');
-    const infected_percentage = document.querySelector('#infected_percentage');
-    const masks_percentage = document.querySelector('#masks_percentage');
+    const board_size = document.querySelector('#board-size');
+    const n_persons = document.querySelector('#n-persons');
+    const infected_percentage = document.querySelector('#infected-percentage');
+    const masks_percentage = document.querySelector('#masks-percentage');
     const speed = document.querySelector('#speed');
     const play_stop = document.querySelector('#play-stop');
 
@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             Move.MAP_SIZE = parseInt(board_size.value);
             n_persons.max = Math.pow(board_size.value, 2);
             n_persons.value = Math.min(n_persons.value, n_persons.max).toString();
-            n_persons.max = board_size.value;
         }
         if (update_infected) {
             INFECTED = Math.floor(n_persons.value * infected_percentage.value);
@@ -45,10 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     update_variables(true, true, true);
 
-    board_size.onchange = () => update_variables(true,true,true);
-    n_persons.onchange = () => update_variables(false,true,true);
-    infected_percentage.onchange = () => update_variables(false,true,false);
-    masks_percentage.onchange = () => update_variables(false, false, true);
+    document.querySelectorAll('.modifiable-input').forEach(input => {
+        input.onchange = event => {
+            const id = event.target.id;
+            const value = parseInt(event.target.value);
+            const min = parseInt(event.target.min);
+            const max = parseInt(event.target.max);
+
+            if (min <= value && value <= max) {
+                if (id === "board-size") update_variables(true,true,true);
+                else if (id === "n-persons") update_variables(false,true,true);
+                else if (id === "infected-percentage") update_variables(false,true,false);
+                else if (id === "masks-percentage") update_variables(false, false, true);
+            }
+        }
+    });
 
     play_stop.onclick = () => {
         if (play_stop.innerHTML === "Play!" || play_stop.innerHTML === "Resume") {
