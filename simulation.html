@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.js"></script>
+    <script src="simulation.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://emoji-css.afeld.me/emoji.css" rel="stylesheet">
+</head>
+<body>
+    <div>
+        <form>
+            <div class="form-row">
+                <div class="col">
+                    <label for="board_size">Board size</label>
+                    <input id="board_size" type="number" max="50" value="10">
+                </div>
+
+                <div class="col">
+                    <label for="n_persons">Population</label>
+                    <input id="n_persons" type="number" value="10">
+                </div>
+
+                <div class="col">
+                    <label for="infected_percentage">% Infected</label>
+                    <input id="infected_percentage" value="0.5" type="number" min="0" max="1" step="0.01">
+                </div>
+
+                <div class="col">
+                    <label for="masks_percentage">% Masks</label>
+                    <input id="masks_percentage" value="0.5" type="number" min="0" max="1" step="0.01">
+                </div>
+
+                <div class="col">
+                    <label for="speed">Speed (s)</label>
+                    <input id="speed" type="number" min="0" value="1" step="0.01">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="play-stop">Play!</button>
+        </form>
+    </div>
+    <div id="board"></div>
+    <div id="rectangle"></div>
+    <div id="stats">
+        <div>
+            <b>Infected: </b><span id="infected_count"></span>
+        </div>
+        <div>
+            <b>Masks: </b><span id="masks_count"></span>
+        </div>
+        <div>
+            <b>N epochs: </b><span id="epoch_count">0</span>
+        </div>
+    </div>
+
+</body>
+</html>
