@@ -1,15 +1,90 @@
-const MAP_SIZE = 10;
-const SPEED = 1000;  // in ms
 const MINIMUM_DISTANCE = 1;
-const N_PERSONS = 10;
-const INFECTED_PERCENTAGE = 0.2;
-const MASKS_PERCENTAGE = 0.5;
-const MASKS = Math.floor(N_PERSONS * MASKS_PERCENTAGE);
-let INFECTED = Math.floor(N_PERSONS * INFECTED_PERCENTAGE);
+let SPEED = 0;
+let MASKS = 0;
+let INFECTED = 0;
+let EPOCH = 0;
+let STOP = false;
 
 const LEFT_INIT = 100;
 const TOP_INIT = 100;
-const PADDING = 20;
+const PADDING = 30;
+
+let POPULATION = [];
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const board_size = document.querySelector('#board_size');
+    const n_persons = document.querySelector('#n_persons');
+    const infected_percentage = document.querySelector('#infected_percentage');
+    const masks_percentage = document.querySelector('#masks_percentage');
+    const speed = document.querySelector('#speed');
+    const play_stop = document.querySelector('#play-stop');
+
+    function update_variables(update_size, update_infected, update_masks) {
+        if (update_size) {
+            Move.MAP_SIZE = parseInt(board_size.value);
+            n_persons.max = Math.pow(board_size.value, 2);
+            n_persons.value = Math.min(n_persons.value, n_persons.max).toString();
+            n_persons.max = board_size.value;
+        }
+        if (update_infected) {
+            INFECTED = Math.floor(n_persons.value * infected_percentage.value);
+            document.querySelector('#infected_count').innerHTML = `${INFECTED}`;
+        }
+        if (update_masks) {
+            MASKS = Math.floor(n_persons.value * masks_percentage.value);
+            document.querySelector('#masks_count').innerHTML = `${MASKS}`;
+        }
+        if (play_stop.innerHTML !== "Play!") { // Finished or resume case
+            EPOCH = 0;
+            document.querySelector('#epoch_count').innerHTML = `${EPOCH}`;
+            play_stop.innerHTML = "Play!";
+        }
+        init(parseInt(board_size.value), parseInt(n_persons.value), INFECTED, MASKS);
+    }
+
+    update_variables(true, true, true);
+
+    board_size.onchange = () => update_variables(true,true,true);
+    n_persons.onchange = () => update_variables(false,true,true);
+    infected_percentage.onchange = () => update_variables(false,true,false);
+    masks_percentage.onchange = () => update_variables(false, false, true);
+
+    play_stop.onclick = () => {
+        if (play_stop.innerHTML === "Play!" || play_stop.innerHTML === "Resume") {
+
+            if (play_stop.innerHTML === "Play!") {
+                SPEED = parseInt(document.querySelector('#speed').value) * 1000;  // in ms
+            }
+
+            board_size.readOnly = true;
+            n_persons.readOnly = true;
+            infected_percentage.readOnly = true;
+            masks_percentage.readOnly = true;
+            speed.readOnly = true;
+            STOP = false;
+            play_stop.innerHTML = "Stop";
+            simulation(parseInt(n_persons.value)).then(async (finished) => {
+                await new Promise(r => setTimeout(r, SPEED));  // Wait for final move
+                board_size.readOnly = false;
+                n_persons.readOnly = false;
+                infected_percentage.readOnly = false;
+                masks_percentage.readOnly = false;
+                speed.readOnly = false;
+                if (finished) {  // Infection finished
+                    alert("POPULATION TOTALLY INFECTED. By clicking accept, board will be reinitialized");
+                    update_variables(false, true, false);
+                } else {  // Infection stopped
+                    play_stop.innerHTML = "Resume";
+                }
+            });
+        } else if (play_stop.innerHTML === "Stop") {
+            STOP = true;
+            play_stop.innerHTML = "Stopping...";
+        }
+        return false;  // Avoid form to be submitted
+    };
+})
 
 
 function to_absolute_px_x(x) {
@@ -24,6 +99,7 @@ function to_absolute_px_y(y) {
 class Move {
     static TYPES = ["Stay", "Up", "Down", "Left", "Right", "Up-Left", "Up-Right", "Down-Left", "Down-Right"];
     static LOCATION_INDEXES = []
+    static MAP_SIZE;
 
     constructor(x_init, y_init, move_type) {
         this.x_init = x_init;
@@ -49,7 +125,7 @@ class Move {
     }
 
     in_map() {
-        return 0 <= this.x_dest && this.x_dest < MAP_SIZE && 0 <= this.y_dest && this.y_dest < MAP_SIZE;
+        return 0 <= this.x_dest && this.x_dest < Move.MAP_SIZE && 0 <= this.y_dest && this.y_dest < Move.MAP_SIZE;
     }
 
     to_free_pos() {
@@ -148,32 +224,39 @@ class Person {
     }
 }
 
-function population_init() {
+function population_init(board_size, n_persons, infected, masks) {
     const total_indexes = [];
-    for (const i of Array(MAP_SIZE).keys()) {
-        for (const j of Array(MAP_SIZE).keys()) {
+    for (const i of Array(board_size).keys()) {
+        for (const j of Array(board_size).keys()) {
             total_indexes.push([i, j])
         }
     }
-    Move.LOCATION_INDEXES = _.sampleSize(total_indexes, N_PERSONS);
 
-    const infected_indexes = _.shuffle(Array(...Array(INFECTED)).map(() => true)
-        .concat(Array(...Array(N_PERSONS - INFECTED)).map(() => false)));
-    const masks_indexes = _.shuffle(Array(...Array(MASKS)).map(() => true)
-        .concat(Array(...Array(N_PERSONS - MASKS)).map(() => false)));
+    Move.LOCATION_INDEXES = _.sampleSize(total_indexes, n_persons);
+
+    const infected_indexes = _.shuffle(Array(...Array(infected)).map(() => true)
+        .concat(Array(...Array(n_persons - infected)).map(() => false)));
+    const masks_indexes = _.shuffle(Array(...Array(masks)).map(() => true)
+        .concat(Array(...Array(n_persons - masks)).map(() => false)));
 
     const population = [];
     _.zip(Move.LOCATION_INDEXES, infected_indexes, masks_indexes).forEach(element => {
         const location = element[0];
-        const infected = element[1];
-        const mask = element[2];
-        population.push(new Person(location[0], location[1], infected, mask));
+        const is_infected = element[1];
+        const wearing_mask = element[2];
+        population.push(new Person(location[0], location[1], is_infected, wearing_mask));
     });
     return population;
 }
 
 
 function board_init(population) {
+    const board = document.querySelector('#board');
+    // Remove previous display
+    while(board.firstChild) {
+        board.removeChild(board.firstChild);
+    }
+
     for (const person of population) {
         const span = document.createElement('span');
         span.id = `person-${person.id}`;
@@ -181,25 +264,34 @@ function board_init(population) {
         span.innerHTML = person.emoji;
         span.style.left = to_absolute_px_x(person.x);
         span.style.top = to_absolute_px_y(person.y);
-        document.querySelector('#board').append(span);
+        board.appendChild(span);
     }
+    const rectangle = document.querySelector('#rectangle');
+    rectangle.style.position = 'absolute';
+    rectangle.style.left = `${LEFT_INIT}px`;
+    rectangle.style.top = `${TOP_INIT}px`;
+    rectangle.style.height = `${Move.MAP_SIZE * PADDING}px`;
+    rectangle.style.width = `${Move.MAP_SIZE * PADDING}px`;
+    rectangle.style.border = "1px solid #000";
+}
+
+function init(board_size, n_persons, infected, masks) {
+    POPULATION = population_init(board_size, n_persons, infected, masks);
+    board_init(POPULATION);
 }
 
 
-async function simulation() {
-    let population = population_init();
+async function simulation(n_persons) {
 
-    board_init(population);
+    while (INFECTED < n_persons && !STOP) {
+        await new Promise(r => setTimeout(r, SPEED));
 
-    while (INFECTED < N_PERSONS) {
-        await new Promise(r => setTimeout(r, SPEED));  // TODO: add something???
+        let should_update = Array(...Array(n_persons)).map(() => false);
 
-        let should_update = Array(...Array(N_PERSONS)).map(() => false);
-
-        for (let i = 0; i < N_PERSONS - 1; i++) {
-            for (let j = i + 1; j < N_PERSONS; j++) {
-                const person1 = population[i];
-                const person2 = population[j];
+        for (let i = 0; i < n_persons - 1; i++) {
+            for (let j = i + 1; j < n_persons; j++) {
+                const person1 = POPULATION[i];
+                const person2 = POPULATION[j];
                 const infection_result = Person.check_infection(person1, person2);
                 should_update[person1.id] = should_update[person1.id] || infection_result[0];
                 should_update[person2.id] = should_update[person2.id] || infection_result[1];
@@ -207,15 +299,16 @@ async function simulation() {
         }
 
 
-        population = _.shuffle(population);
-        for (let person of population) {
+        POPULATION = _.shuffle(POPULATION);
+        for (let person of POPULATION) {
             if (should_update[person.id]) {
                 INFECTED++;
                 person.set_infected();
             }
             person.move();
         }
-
-        console.log(`Total INFECTED: ${INFECTED}`);
+        document.querySelector('#infected_count').innerHTML = `${INFECTED}`;
+        document.querySelector('#epoch_count').innerHTML = `${EPOCH++}`;
     }
+    return INFECTED === n_persons;  // So the caller knows if infection is finished or stopped
 }
