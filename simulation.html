@@ -1,58 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wear A Mask!</title>
+    <link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/twitter/259/face-with-medical-mask_1f637.png" type="image/x-icon">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.js"></script>
     <script src="simulation.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="https://emoji-css.afeld.me/emoji.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 </head>
 <body>
-    <div>
-        <form>
-            <div class="form-row">
-                <div class="col">
-                    <label for="board-size">Board size</label>
-                    <input id="board-size" class="modifiable-input" type="number" min="1" max="50" value="10">
-                </div>
+    <h1 style="text-align: center"><img style="max-width: 100%" src="logo.png" alt="Wear a mask!"></h1>
+    <div class="row">
+        <div id="description" class="col-lg-3 col-sm-6">
+            Welcome to WearAMask! This project has been developed with the idea of...
+            <img style="max-width: 100%; max-height: 100%" src="masks_prob.png" alt="masks probability">
+        </div>
+        <div id="form" class="col-lg-3 col-sm-6">
+            <form>
+                <div class="form-row">
+                    <div class="col-6">
+                        <label for="board-size">Board size</label>
+                        <input id="board-size" class="form-control modifiable-input" type="number" min="1" value="20">
+                    </div>
 
-                <div class="col">
-                    <label for="n-persons">Population</label>
-                    <input id="n-persons" class="modifiable-input" type="number" min="1" value="10">
-                </div>
+                    <div class="col-6">
+                        <label for="n-persons">Population</label>
+                        <input id="n-persons" class="form-control modifiable-input" type="number" min="1" value="10">
+                    </div>
 
-                <div class="col">
-                    <label for="infected-percentage">% Infected</label>
-                    <input id="infected-percentage" class="modifiable-input" value="0.5" type="number" min="0" max="1" step="0.01">
-                </div>
+                    <div class="col-6">
+                        <label for="infected-percentage">% Infected</label>
+                        <input id="infected-percentage" class="form-control modifiable-input" value="0.5" type="number" min="0" max="1" step="0.01">
+                    </div>
 
-                <div class="col">
-                    <label for="masks-percentage">% Masks</label>
-                    <input id="masks-percentage" class="modifiable-input" value="0.5" type="number" min="0" max="1" step="0.01">
-                </div>
+                    <div class="col-6">
+                        <label for="masks-percentage">% Masks</label>
+                        <input id="masks-percentage" class="form-control modifiable-input" value="0.5" type="number" min="0" max="1" step="0.01">
+                    </div>
 
-                <div class="col">
-                    <label for="speed">Speed (s)</label>
-                    <input id="speed" type="number" min="0" value="1" step="0.01">
+                    <div class="col-6">
+                        <label for="speed">Speed (s)</label>
+                        <input id="speed" class="form-control" type="number" min="0" value="1" step="0.01">
+                    </div>
+
+                    <button class="col-6 btn btn-primary" id="play-stop" style="height: fit-content; position: relative; top: 32px">Play!</button>
+
+
+                </div>
+            </form>
+            <div id="legend">
+                <b>Legend:</b>
+                <ul>
+                   <li>
+                        <img class="legend-icon" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/twitter/259/face-with-medical-mask_1f637.png">
+                        : Healthy with mask
+                    </li>
+                    <li>
+                        <img class="legend-icon" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/259/confused-face_1f615.png">
+                        : Healthy without mask
+                    </li>
+                    <li>
+                        <img class="legend-icon ill-filter" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/twitter/259/face-with-medical-mask_1f637.png">
+                        : Ill with mask
+                    </li>
+                    <li>
+                        <img class="legend-icon ill-filter" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/259/face-with-thermometer_1f912.png">
+                        : Ill without mask
+                    </li>
+                </ul>
+            </div>
+            <div id="stats">
+                <div>
+                    <b>Infected: </b><span id="infected_count"></span>
+                </div>
+                <div>
+                    <b>Masks: </b><span id="masks_count"></span>
+                </div>
+                <div>
+                    <b>N epochs: </b><span id="epoch_count">0</span>
                 </div>
             </div>
-            <button class="btn btn-primary" id="play-stop">Play!</button>
-        </form>
-    </div>
-    <div id="board"></div>
-    <div id="rectangle"></div>
-    <div id="stats">
-        <div>
-            <b>Infected: </b><span id="infected_count"></span>
         </div>
-        <div>
-            <b>Masks: </b><span id="masks_count"></span>
+        <div class="col-lg-6 col-sm-12">
+           <div id="board"></div>
+            <div id="rectangle"></div>
         </div>
-        <div>
-            <b>N epochs: </b><span id="epoch_count">0</span>
-        </div>
-    </div>
 
+    </div>
 </body>
 </html>

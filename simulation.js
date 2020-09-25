@@ -1,12 +1,14 @@
 const MINIMUM_DISTANCE = 1;
+const BOOTSTRAP_LARGE_WINDOW_WIDTH = 992;  // 'lg' size for Bootstrap, used on window resize
 let SPEED = 0;
 let MASKS = 0;
 let INFECTED = 0;
 let EPOCH = 0;
 let STOP = false;
+let RUNNING = true;
 
-const LEFT_INIT = 100;
-const TOP_INIT = 100;
+const LEFT_INIT = 30;
+const TOP_INIT = 0;
 const PADDING = 30;
 
 let POPULATION = [];
@@ -28,21 +30,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (update_infected) {
             INFECTED = Math.floor(n_persons.value * infected_percentage.value);
-            document.querySelector('#infected_count').innerHTML = `${INFECTED}`;
+            document.querySelector('#infected_count').innerHTML = INFECTED.toString();
         }
         if (update_masks) {
             MASKS = Math.floor(n_persons.value * masks_percentage.value);
-            document.querySelector('#masks_count').innerHTML = `${MASKS}`;
+            document.querySelector('#masks_count').innerHTML = MASKS.toString();
         }
-        if (play_stop.innerHTML !== "Play!") { // Finished or resume case
+        if (play_stop.innerHTML !== "Play!" && !RUNNING) { // Finished or resume case
             EPOCH = 0;
-            document.querySelector('#epoch_count').innerHTML = `${EPOCH}`;
+            document.querySelector('#epoch_count').innerHTML = EPOCH.toString();
             play_stop.innerHTML = "Play!";
         }
+
         init(parseInt(board_size.value), parseInt(n_persons.value), INFECTED, MASKS);
+
+    }
+
+    function resize_board_to_max() {
+        let divisor = 1;
+        if (window.innerWidth >= BOOTSTRAP_LARGE_WINDOW_WIDTH) {
+            divisor = 2;
+        }
+
+        board_size.max = Math.floor((window.innerWidth/divisor - 2*LEFT_INIT)/PADDING);
+
+        if (board_size.value > board_size.max) {
+            board_size.value = board_size.max;
+            update_variables(true, false, false);
+        }
     }
 
     update_variables(true, true, true);
+    resize_board_to_max();
+
+    window.onresize = resize_board_to_max;
 
     document.querySelectorAll('.modifiable-input').forEach(input => {
         input.onchange = event => {
@@ -62,11 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     play_stop.onclick = () => {
         if (play_stop.innerHTML === "Play!" || play_stop.innerHTML === "Resume") {
-
-            if (play_stop.innerHTML === "Play!") {
-                SPEED = parseInt(document.querySelector('#speed').value) * 1000;  // in ms
-            }
-
+            SPEED = parseFloat(document.querySelector('#speed').value) * 1000;  // in ms
             board_size.readOnly = true;
             n_persons.readOnly = true;
             infected_percentage.readOnly = true;
@@ -74,8 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
             speed.readOnly = true;
             STOP = false;
             play_stop.innerHTML = "Stop";
+            RUNNING = true;
             simulation(parseInt(n_persons.value)).then(async (finished) => {
                 await new Promise(r => setTimeout(r, SPEED));  // Wait for final move
+                RUNNING = false;
                 board_size.readOnly = false;
                 n_persons.readOnly = false;
                 infected_percentage.readOnly = false;
@@ -167,8 +186,8 @@ class Person {
     static EMOJIS = new Map()  // (is_infected, wearing_mask)
         .set('[false, false]', '<i class="em em-confused"></i>')
         .set('[false, true]', '<i class="em em-mask"></i>')
-        .set('[true, false]', '<i style="filter: hue-rotate(40deg) brightness(75%);" class="em em-face_with_thermometer"></i>')
-        .set('[true, true]', '<i style="filter: hue-rotate(40deg) brightness(75%);" class="em em-mask"></i>');
+        .set('[true, false]', '<i class="em em-face_with_thermometer ill-filter"></i>')
+        .set('[true, true]', '<i class="em em-mask ill-filter"></i>');
 
     constructor(x, y, infected, mask) {
         this.id = Person.__id++;
