@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (board_size.value > board_size.max) {
             board_size.value = board_size.max;
-            update_variables(true, false, false);
+            update_variables(true, true, true);
         }
     }
 
@@ -127,7 +127,7 @@ function to_absolute_px_y(y) {
 
 class Move {
     static TYPES = ["Stay", "Up", "Down", "Left", "Right", "Up-Left", "Up-Right", "Down-Left", "Down-Right"];
-    static LOCATION_INDEXES = []
+    static LOCATION_INDEXES = [];
     static MAP_SIZE;
 
     constructor(x_init, y_init, move_type) {
@@ -241,7 +241,7 @@ class Person {
                 person.animate({
                     left: [to_absolute_px_x(this.x), to_absolute_px_x(move.x_dest)],
                     top: [to_absolute_px_y(this.y), to_absolute_px_y(move.y_dest)]
-                }, SPEED)
+                }, SPEED);
 
                 person.style.left = to_absolute_px_x(move.x_dest);
                 person.style.top = to_absolute_px_y(move.y_dest);
@@ -257,7 +257,7 @@ function population_init(board_size, n_persons, infected, masks) {
     const total_indexes = [];
     for (const i of Array(board_size).keys()) {
         for (const j of Array(board_size).keys()) {
-            total_indexes.push([i, j])
+            total_indexes.push([i, j]);
         }
     }
 
@@ -282,7 +282,7 @@ function population_init(board_size, n_persons, infected, masks) {
 function board_init(population) {
     const board = document.querySelector('#board');
     // Remove previous display
-    while(board.firstChild) {
+    while (board.firstChild) {
         board.removeChild(board.firstChild);
     }
 
