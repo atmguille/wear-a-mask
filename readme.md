@@ -24,8 +24,6 @@ After some tests with different combination of variables, the user should note t
 
 Moreover, the web has been developed mobile-responsive - adjusting to window size - so it can also be consulted through smartphones.
 
-A final comment should be done about `simulation.py`. This file contains the logic of the simulation in _Python_ before it was translated to _JavaScript_.
-
 ## Roadmap and future work
 
 In future versions of this project, these may be some of the next steps:
@@ -36,6 +34,17 @@ In future versions of this project, these may be some of the next steps:
 
 ## CS50
 
-This project was developed with the basic knowledge of web programming that the course **CS50's Web Programming with Python and JavaScript** gave me. In fact, I used it as part of the personal final project, which you may find in `cs50_requirements` branch. There, using _Django_, some additional requirements are added, such as a forum where people could share their ideas to fight the pandemic, ...
+This project was developed with the basic knowledge of web programming that the course **CS50's Web Programming with Python and JavaScript** gave me. 
+
+### Important files
+
+* `simulation.py`: contains the logic of the simulation in _Python_ before it was translated to _JavaScript_.
+* `simulation.js`: contains all the front-end functionality, from the proper simulation to control of inputs and buttons.
+* `simulation.html`: main template, where the site is described, the user can type in the values for the different variables and the simulation is visualized.
+* `forum.html`: forum template, where registered users can make comments about ideas for fighting COVID-19.
+
+ ### Distinctiveness and complexity justification
+
+I believe the project satisfies the specified requirements since the implemented idea is totally different to the projects developed in the course. The front-end simulation and animation required lots of _JavaScript_ work, and I definitely improved my skills of this language thanks to this final project. The forum part, which is more of the back-end, is quite simpler than the simulation part, but that is because the nature of the idea and because of the fact that most of the work was done in the front-end.
 
 Enjoy...and #WearAMask!
