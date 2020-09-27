@@ -1,5 +1,5 @@
 const MINIMUM_DISTANCE = 1;
-const BOOTSTRAP_LARGE_WINDOW_WIDTH = 992;  // 'lg' size for Bootstrap, used on window resize
+const BOOTSTRAP_SMALL_WINDOW_WIDTH = 576;  // 'lg' size for Bootstrap, used on window resize
 let SPEED = 0;
 let MASKS = 0;
 let INFECTED = 0;
@@ -45,9 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resize_board_to_max() {
-        // As defined in the html file, if window is large, board occupies half of the space (divisor = 2)
+        // As defined in the html file, if window is larger than small (sm), board occupies half of the space (divisor = 2)
         let divisor = 1;
-        if (window.innerWidth >= BOOTSTRAP_LARGE_WINDOW_WIDTH) {
+        if (window.innerWidth >= BOOTSTRAP_SMALL_WINDOW_WIDTH) {
             divisor = 2;
         }
 

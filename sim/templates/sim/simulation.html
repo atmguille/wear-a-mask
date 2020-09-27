@@ -14,8 +14,20 @@
         <a href="{% url 'forum' %}">Visit the forum!</a>
     </div>
     <div class="row">
-        <div id="description" class="col-lg-3 col-sm-6">
-            Welcome to WearAMask! This project has been developed with the idea of...
+        <div id="description" class="col-lg-3 col-sm-12">
+            <p>Welcome to WearAMask!</p>
+            <p>
+                This simple website has been made with the purpose of highlighting the importance of <b>using a mask</b>.
+                Through executing the simulation with different combinations of variables, the user should realize that
+                populations where mask percentage is higher take more epochs to get fully infected than others.
+                Also, <b>social distance</b> (board size) is another key factor.
+            </p>
+            <p>
+                The population is randomly distributed and moves randomly. The probability of infection, which is
+                applied when two people are closer than the minimum safe distance, can be found below in the image.
+                For more details, visit the <a href="https://github.com/atmguille/wear-a-mask">GitHub project</a>
+            </p>
+            <p>Enjoy... and <span style="color: #54B2A9">#WearAMask</span><i class="em em-mask"></i></p>
             <img style="max-width: 100%; max-height: 100%" src="{% static 'sim/masks_prob.png' %}" alt="masks probability">
         </div>
         <div id="form" class="col-lg-3 col-sm-6">
@@ -80,7 +92,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-sm-12">
+        <div class="col-lg-6 col-sm-6">
            <div id="board"></div>
             <div id="rectangle"></div>
         </div>
