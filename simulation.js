@@ -5,7 +5,6 @@ let MASKS = 0;
 let INFECTED = 0;
 let EPOCH = 0;
 let STOP = false;
-let RUNNING = true;
 
 const LEFT_INIT = 30;
 const TOP_INIT = 0;
@@ -20,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const infected_percentage = document.querySelector('#infected-percentage');
     const masks_percentage = document.querySelector('#masks-percentage');
     const speed = document.querySelector('#speed');
-    const play_stop = document.querySelector('#play-stop');
+    const play_stop = document.querySelector('.play-stop-button');
 
     function update_variables(update_size, update_infected, update_masks) {
         if (update_size) {
@@ -36,11 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
             MASKS = Math.floor(n_persons.value * masks_percentage.value);
             document.querySelector('#masks_count').innerHTML = MASKS.toString();
         }
-        if (play_stop.innerHTML !== "Play!" && !RUNNING) { // Finished or resume case
-            EPOCH = 0;
-            document.querySelector('#epoch_count').innerHTML = EPOCH.toString();
-            play_stop.innerHTML = "Play!";
-        }
+
+        STOP = true;
+        EPOCH = 0;
+        document.querySelector('#epoch_count').innerHTML = EPOCH.toString();
 
         init(parseInt(board_size.value), parseInt(n_persons.value), INFECTED, MASKS);
 
@@ -82,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     play_stop.onclick = () => {
-        if (play_stop.innerHTML === "Play!" || play_stop.innerHTML === "Resume") {
+        if (play_stop.id === "play") {  // ids instead of innerHTML is used to avoid problems with translations
             SPEED = parseFloat(document.querySelector('#speed').value) * 1000;  // in ms
             board_size.readOnly = true;
             n_persons.readOnly = true;
@@ -90,11 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
             masks_percentage.readOnly = true;
             speed.readOnly = true;
             STOP = false;
+            play_stop.id = "stop";
             play_stop.innerHTML = "Stop";
-            RUNNING = true;
             simulation(parseInt(n_persons.value)).then(async (finished) => {
                 await new Promise(r => setTimeout(r, SPEED));  // Wait for final move
-                RUNNING = false;
+                play_stop.id = "play";
                 board_size.readOnly = false;
                 n_persons.readOnly = false;
                 infected_percentage.readOnly = false;
@@ -103,11 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (finished) {  // Infection finished
                     alert("POPULATION TOTALLY INFECTED. By clicking accept, board will be reinitialized");
                     update_variables(false, true, false);
+                    play_stop.innerHTML = "Play!";
                 } else {  // Infection stopped
-                    play_stop.innerHTML = "Resume";
+                    play_stop.innerHTML = "Restart";
                 }
             });
-        } else if (play_stop.innerHTML === "Stop") {
+        } else if (play_stop.id === "stop") {
             STOP = true;
             play_stop.innerHTML = "Stopping...";
         }
