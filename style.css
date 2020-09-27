@@ -11,11 +11,6 @@ html * {
     font-size: large;
 }
 
-.legend-icon {
-    width: 24px;
-    height: 25.33px;
-}
-
 .ill-filter {
     filter: hue-rotate(40deg) brightness(75%);
 }
