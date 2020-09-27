@@ -1,8 +1,8 @@
 ![](media/logo.png)
 
-To begin with, as there is no better way of overviewing a project than to test it your self, the actual web-page is currently available ![here](http://dangui.duckdns.org/wear-a-mask/simulation.html) TODO: index.html or simulation.html.
+To begin with, as there is no better way of overviewing a project than to test it your self, the actual web-page is currently available ![here](http://dangui.duckdns.org/wear-a-mask/index.html)
 
-TODO: add GIF
+![](media/simulation.gif)
 
 ## Objectives
 
