@@ -1,5 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap");
+
 html * {
-    font-family: "Courier 10 Pitch",serif;
+    font-family: "Poppins",sans-serif;
+}
+
+body {
+    background-image: url("../media/background.png");
+}
+
+#description {
+    text-align: center;
 }
 
 #stats {
