@@ -12,6 +12,21 @@ const PADDING = 30;
 
 let POPULATION = [];
 
+// Variables that should be STATIC (but cannot be declared as such to avoid problems with Safari)
+const MOVE_TYPES = ["Stay", "Up", "Down", "Left", "Right", "Up-Left", "Up-Right", "Down-Left", "Down-Right"];
+let MOVE_LOCATION_INDEXES = [];
+let MOVE_MAP_SIZE;
+let PERSON__id = 0;
+const PERSON_PROBABILITIES = new Map()  // (infected wearing mask, to_infect wearing_mask)
+    .set('[false, false]', 0.9)
+    .set('[false, true]', 0.7)
+    .set('[true, false]', 0.05)
+    .set('[true, true]', 0.015);
+const PERSON_EMOJIS = new Map()  // (is_infected, wearing_mask)
+    .set('[false, false]', '<i class="em em-confused"></i>')
+    .set('[false, true]', '<i class="em em-mask"></i>')
+    .set('[true, false]', '<i class="em em-face_with_thermometer ill-filter"></i>')
+    .set('[true, true]', '<i class="em em-mask ill-filter"></i>');
 
 document.addEventListener('DOMContentLoaded', () => {
     const board_size = document.querySelector('#board-size');
@@ -23,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function update_variables(update_size, update_infected, update_masks) {
         if (update_size) {
-            Move.MAP_SIZE = parseInt(board_size.value);
+            MOVE_MAP_SIZE = parseInt(board_size.value);
             n_persons.max = Math.pow(board_size.value, 2);
             n_persons.value = Math.min(n_persons.value, n_persons.max).toString();
         }
@@ -128,9 +143,6 @@ function to_absolute_px_y(y) {
 
 
 class Move {
-    static TYPES = ["Stay", "Up", "Down", "Left", "Right", "Up-Left", "Up-Right", "Down-Left", "Down-Right"];
-    static LOCATION_INDEXES = [];
-    static MAP_SIZE;
 
     constructor(x_init, y_init, move_type) {
         this.x_init = x_init;
@@ -156,12 +168,12 @@ class Move {
     }
 
     in_map() {
-        return 0 <= this.x_dest && this.x_dest < Move.MAP_SIZE && 0 <= this.y_dest && this.y_dest < Move.MAP_SIZE;
+        return 0 <= this.x_dest && this.x_dest < MOVE_MAP_SIZE && 0 <= this.y_dest && this.y_dest < MOVE_MAP_SIZE;
     }
 
     to_free_pos() {
         // Note: includes will not work due to inconsistencies with array comparison (that's why JSON is used to compare them)
-        return !Move.LOCATION_INDEXES.some(item => JSON.stringify(item) === JSON.stringify([this.x_dest, this.y_dest]));
+        return !MOVE_LOCATION_INDEXES.some(item => JSON.stringify(item) === JSON.stringify([this.x_dest, this.y_dest]));
     }
 
     is_valid() {
@@ -171,28 +183,17 @@ class Move {
     update_indexes() {
         if (!this.is_stay()) {
             // 'remove' method does not exist. Also, array comparison has inconsistencies. That's why JSON is used to compare them
-            Move.LOCATION_INDEXES = Move.LOCATION_INDEXES.filter((item, index, arr) =>
+            MOVE_LOCATION_INDEXES = MOVE_LOCATION_INDEXES.filter((item, index, arr) =>
                 JSON.stringify(item) !== JSON.stringify([this.x_init, this.y_init]));
-            Move.LOCATION_INDEXES.push([this.x_dest, this.y_dest]);
+            MOVE_LOCATION_INDEXES.push([this.x_dest, this.y_dest]);
         }
     }
 }
 
 class Person {
-    static __id = 0;
-    static PROBABILITIES = new Map()  // (infected wearing mask, to_infect wearing_mask)
-        .set('[false, false]', 0.9)
-        .set('[false, true]', 0.7)
-        .set('[true, false]', 0.05)
-        .set('[true, true]', 0.015);
-    static EMOJIS = new Map()  // (is_infected, wearing_mask)
-        .set('[false, false]', '<i class="em em-confused"></i>')
-        .set('[false, true]', '<i class="em em-mask"></i>')
-        .set('[true, false]', '<i class="em em-face_with_thermometer ill-filter"></i>')
-        .set('[true, true]', '<i class="em em-mask ill-filter"></i>');
 
     constructor(x, y, infected, mask) {
-        this.id = Person.__id++;
+        this.id = PERSON__id++;
         this.x = x;
         this.y = y;
         this.is_infected = infected;
@@ -200,7 +201,7 @@ class Person {
     }
 
     get emoji() {
-        return Person.EMOJIS.get(`[${this.is_infected}, ${this.wearing_mask}]`);
+        return PERSON_EMOJIS.get(`[${this.is_infected}, ${this.wearing_mask}]`);
     }
 
     is_close(other) {
@@ -213,7 +214,7 @@ class Person {
     }
 
     should_infect(to_infect) {
-        const probability = Person.PROBABILITIES.get(`[${this.wearing_mask}, ${to_infect.wearing_mask}]`);
+        const probability = PERSON_PROBABILITIES.get(`[${this.wearing_mask}, ${to_infect.wearing_mask}]`);
         return Math.random() < probability;
     }
 
@@ -233,7 +234,7 @@ class Person {
     }
 
     move() {
-        const move_types = _.shuffle(Move.TYPES);
+        const move_types = _.shuffle(MOVE_TYPES);
         for (const move_type of move_types) {
             let move = new Move(this.x, this.y, move_type);
             if (move.is_valid()) {
@@ -263,7 +264,7 @@ function population_init(board_size, n_persons, infected, masks) {
         }
     }
 
-    Move.LOCATION_INDEXES = _.sampleSize(total_indexes, n_persons);
+    MOVE_LOCATION_INDEXES = _.sampleSize(total_indexes, n_persons);
 
     const infected_indexes = _.shuffle(Array(...Array(infected)).map(() => true)
         .concat(Array(...Array(n_persons - infected)).map(() => false)));
@@ -271,7 +272,7 @@ function population_init(board_size, n_persons, infected, masks) {
         .concat(Array(...Array(n_persons - masks)).map(() => false)));
 
     const population = [];
-    _.zip(Move.LOCATION_INDEXES, infected_indexes, masks_indexes).forEach(element => {
+    _.zip(MOVE_LOCATION_INDEXES, infected_indexes, masks_indexes).forEach(element => {
         const location = element[0];
         const is_infected = element[1];
         const wearing_mask = element[2];
@@ -301,8 +302,8 @@ function board_init(population) {
     rectangle.style.position = 'absolute';
     rectangle.style.left = `${LEFT_INIT}px`;
     rectangle.style.top = `${TOP_INIT}px`;
-    rectangle.style.height = `${Move.MAP_SIZE * PADDING}px`;
-    rectangle.style.width = `${Move.MAP_SIZE * PADDING}px`;
+    rectangle.style.height = `${MOVE_MAP_SIZE * PADDING}px`;
+    rectangle.style.width = `${MOVE_MAP_SIZE * PADDING}px`;
     rectangle.style.border = "1px solid #000";
 }
 
