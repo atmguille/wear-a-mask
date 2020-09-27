@@ -45,12 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resize_board_to_max() {
+        // As defined in the html file, if window is large, board occupies half of the space (divisor = 2)
         let divisor = 1;
         if (window.innerWidth >= BOOTSTRAP_LARGE_WINDOW_WIDTH) {
             divisor = 2;
         }
 
-        board_size.max = Math.floor((window.innerWidth/divisor - 2*LEFT_INIT)/PADDING);
+        // board_size.max * PADDING = innerWidth/divisor - 2*Left (Left is a small padding)
+        board_size.max = Math.floor((window.innerWidth/divisor - 2*LEFT_INIT) / PADDING);
 
         if (board_size.value > board_size.max) {
             board_size.value = board_size.max;
@@ -70,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const min = parseInt(event.target.min);
             const max = parseInt(event.target.max);
 
+            // Before updating, check value is in range
             if (min <= value && value <= max) {
                 if (id === "board-size") update_variables(true,true,true);
                 else if (id === "n-persons") update_variables(false,true,true);
@@ -314,8 +317,10 @@ async function simulation(n_persons) {
     while (INFECTED < n_persons && !STOP) {
         await new Promise(r => setTimeout(r, SPEED));
 
+        // Infection update will be done after checking infections among all the population
+        // This is done to avoid one person getting infected and infecting another at the
+        // same moment due to loop order
         let should_update = Array(...Array(n_persons)).map(() => false);
-
         for (let i = 0; i < n_persons - 1; i++) {
             for (let j = i + 1; j < n_persons; j++) {
                 const person1 = POPULATION[i];

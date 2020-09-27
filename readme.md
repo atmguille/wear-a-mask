@@ -1,1 +1,1 @@
-![](logo.png)
+![](sim/static/sim/logo.png)

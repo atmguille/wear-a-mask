@@ -1,21 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wear A Mask!</title>
+{% extends "sim/layout.html" %}
+{% load static %}
+
+{% block includes %}
     <link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/twitter/259/face-with-medical-mask_1f637.png" type="image/x-icon">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.js"></script>
-    <script src="simulation.js"></script>
+    <script src="{% static 'sim/simulation.js' %}"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="https://emoji-css.afeld.me/emoji.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-    <h1 style="text-align: center"><img style="max-width: 100%" src="logo.png" alt="Wear a mask!"></h1>
+{% endblock %}
+
+{% block body %}
+    <div>
+        <a href="{% url 'forum' %}">Visit the forum!</a>
+    </div>
     <div class="row">
         <div id="description" class="col-lg-3 col-sm-6">
             Welcome to WearAMask! This project has been developed with the idea of...
-            <img style="max-width: 100%; max-height: 100%" src="masks_prob.png" alt="masks probability">
+            <img style="max-width: 100%; max-height: 100%" src="{% static 'sim/masks_prob.png' %}" alt="masks probability">
         </div>
         <div id="form" class="col-lg-3 col-sm-6">
             <form>
@@ -54,20 +55,16 @@
                 <b>Legend:</b>
                 <ul>
                    <li>
-                        <img class="legend-icon" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/twitter/259/face-with-medical-mask_1f637.png">
-                        : Healthy with mask
+                        <i class="em em-mask"></i>: Healthy with mask
                     </li>
                     <li>
-                        <img class="legend-icon" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/259/confused-face_1f615.png">
-                        : Healthy without mask
+                        <i class="em em-confused"></i>: Healthy without mask
                     </li>
                     <li>
-                        <img class="legend-icon ill-filter" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/twitter/259/face-with-medical-mask_1f637.png">
-                        : Ill with mask
+                        <i class="em em-mask ill-filter"></i>: Ill with mask
                     </li>
                     <li>
-                        <img class="legend-icon ill-filter" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/259/face-with-thermometer_1f912.png">
-                        : Ill without mask
+                        <i class="em em-face_with_thermometer ill-filter"></i>: Ill without mask
                     </li>
                 </ul>
             </div>
@@ -87,7 +84,5 @@
            <div id="board"></div>
             <div id="rectangle"></div>
         </div>
-
     </div>
-</body>
-</html>
+{% endblock %}
