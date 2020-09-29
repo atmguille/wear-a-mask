@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     update_variables(true, true, true);
     resize_board_to_max();
 
-    window.onresize = resize_board_to_max;
+    window.addEventListener('resize', resize_board_to_max);
 
     document.querySelectorAll('.modifiable-input').forEach(input => {
         input.onchange = event => {
