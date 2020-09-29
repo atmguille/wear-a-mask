@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // board_size.max * PADDING = innerWidth/divisor - 2*Left (Left is a small padding)
         board_size.max = Math.floor((window.innerWidth/divisor - 2*LEFT_INIT) / PADDING);
 
-        if (board_size.value > board_size.max) {
+        if (parseInt(board_size.value) > board_size.max) {
             board_size.value = board_size.max;
             update_variables(true, true, true);
         }
