@@ -16,11 +16,11 @@ First of all, the user can dynamically edit the values in which the simulation i
 
 ![](media/form.png)
 
-Once the simulation has started, the randomly distributed population begins to move and to get infected. In relation with moves, each person chooses randomly where to move (or stay) among all the available positions. Dealing with the infections, when two people, one of them infected,  are closer than the minimum distance, a random test, based on the probabilities shown in the picture below, determines whether the other should get infected or not. A special comment should be done about the probabilities: they are based on some information provided by authorities and confirmed they are rational, but not scientifically proven, by a consulted doctor. This last comment is related to the fact that it is really difficult to determine an exact number, since the infection rate is based on multiple variables - viral load, wind, ...
+Once the simulation has started, the randomly distributed population begins to move and to get infected. In relation to movements, each person chooses randomly where to move (or stay) among all the available positions. Dealing with the infections, when two people, one of them infected,  are closer than the minimum distance, a random test, based on the probabilities shown in the picture below, determines whether the other should get infected or not. A special comment should be done about the probabilities: they are based on information provided by authorities and confirmed to be rational, but not scientifically proven, by a consulted doctor. This last comment is related to the fact that it is really difficult to determine an exact number, since the infection rate is based on multiple variables - viral load, wind, ...
 
 ![](media/masks_prob.png)
 
-After some tests with different combination of variables, the user should note that populations where mask percentage is higher take more epochs to get fully infected than others. Also, as expressed before, social distance (`board size`) is another key factor.
+After some tests with different combination of variables, the user should realize that populations where mask percentage is higher take more epochs to get fully infected than others. Also, as expressed before, social distance (`board size`) is another key factor.
 
 Moreover, the web has been developed mobile-responsive - adjusting to window size - so it can also be consulted through smartphones.
 
