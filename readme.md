@@ -32,6 +32,7 @@ In future versions of this project, these may be some of the next steps:
 
 * Learn about modularization in JavaScript, to better structure `simulation.js`
 * Implement cured and death patients
+* Implement different types of masks (FFP2, surgical mask, ...)
 * Include a lively graph showing the evolution of infections per epoch
 
 ## CS50
