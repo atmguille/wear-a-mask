@@ -20,7 +20,7 @@ Once the simulation has started, the randomly distributed population begins to m
 
 ![](media/masks_prob.png)
 
-After some tests with different combination of variables, the user should realize that populations where mask percentage is higher take more epochs to get fully infected than others. Also, as expressed before, social distance (`board size`) is another key factor.
+After some tests with different combination of variables, the user should realize that populations where mask percentage is higher take more epochs to get fully infected than others. Also, as expressed before, social distance (related to `board size`) is another key factor.
 
 Moreover, the web has been developed mobile-responsive - adjusting to window size - so it can also be consulted through smartphones.
 
